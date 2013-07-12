@@ -1,0 +1,12 @@
+<dl class="dl-horizontal" ng-controller="Info">
+  <dt>Name</dt>
+  <dd>{{state.name}}</dd>
+
+  <dt>Total Players</dt>
+  <dd>{{state.playerCount}}</dd>
+
+  <dt>Your Games</dt>
+  <dd ng-repeat="game in state.games">
+    {{game}}
+  </dd>
+</dl>

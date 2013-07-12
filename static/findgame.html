@@ -1,0 +1,18 @@
+<div class="span12" ng-controller="FindGame">
+  <div class="row">
+    <div class="span8">
+      <h1>Choose your destiny</h1>
+
+      <h2><a href="#" ng-click="newGame()">Create new game</a></h2>
+
+      <ul>
+        <li ng-repeat="game in state.games">
+          {{game}}
+        </li>
+      </ul>
+    </div>
+
+    <div class="span4" ng-include="'info.html'"></div>
+  </div>
+</div>
+
