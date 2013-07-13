@@ -175,6 +175,10 @@ app.controller('Info', function($scope, data) {
     $scope.open = function(id) {
         send('open', id);
     };
+
+    $scope.toGameFinder = function() {
+        data.state.mode = 'findgame';
+    };
 });
 
 app.controller('Game', function($scope, data, sock) {

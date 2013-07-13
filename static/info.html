@@ -5,8 +5,11 @@
   <dt>Total Players</dt>
   <dd>{{state.playerCount}}</dd>
 
-  <dt>Your Games</dt>
+  <dt>My Games</dt>
   <dd ng-repeat="game in myGames">
     <a href="#" ng-click="open(game.id)">{{game.id}}</a>
   </dd>
+
+  <dt>More Games</dt>
+  <dd><a href="#" ng-click="toGameFinder()">Game Finder</a></dd>
 </dl>

@@ -76,7 +76,6 @@ class ApiServer(SockJSConnection):
         self.bc_players()
 
     def on_message(self, msg):
-        print msg
         msg = json.loads(msg)
         type = msg.get('type')
         value = msg.get('value')
