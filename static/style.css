@@ -19,7 +19,3 @@ table.table {
 .table td.usedo {
     background-color: yellow;
 }
-
-.table td.usedx:hover, .table td.usedo:hover {
-    background-color: #f2dede;
-}
