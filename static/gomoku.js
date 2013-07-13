@@ -35,18 +35,18 @@ function checkWin(field, chr, n) {
     if (re.test(unparseField(transpose(field))))
         return true;
 
-    function getSpaces(n) {
+    function preSpace(l, n) {
         var spaces = [];
         for (var i = 0; i < n; i++) {
             spaces.push(' ');
         }
-        return spaces;
+        return spaces.concat(l);
     }
 
     // left-to-right diagonal win
     var diag = [];
     for (var i = field.length - 1; i >= 0; i--) {
-        diag.unshift(getSpaces(field.length - i - 1).concat(field[i]));
+        diag.unshift(preSpace(field[i], field.length - i - 1));
     }
     if (re.test(unparseField(transpose(diag))))
         return true;
@@ -54,7 +54,7 @@ function checkWin(field, chr, n) {
     // right-to-left diagonal win
     diag = [];
     for (i = 0; i < field.length; i++) {
-        diag.unshift(getSpaces(i).concat(field[i]));
+        diag.push(preSpace(field[i], i));
     }
     if (re.test(unparseField(transpose(diag))))
         return true;
@@ -197,6 +197,8 @@ app.controller('Game', function($scope, data, sock) {
     };
 
     $scope.put = function(x, y) {
+        if ($scope.game.done)
+            return;
         if (!$scope.myTurn)
             return;
         if ($scope.lastTurn) // do nothing until we get approval for last turn

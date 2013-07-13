@@ -97,9 +97,10 @@ class ApiServer(SockJSConnection):
                               'player1': self.players[self]['name'],
                               'player2': None,
                               'size': 15,
+                              'inarow': 5,
                               'field': empty_field(15),
                               'eventurn': False,
-                              'done': False})
+                              'done': None})
         self.bc_games()
 
     def handle_join(self, id):
