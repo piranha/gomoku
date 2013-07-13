@@ -16,17 +16,26 @@ class IndexHandler(web.RequestHandler):
         self.finish(file(op.join(ROOT, 'static/index.html')).read())
 
 
+class NoCacheStaticFileHandler(web.StaticFileHandler):
+    def set_extra_headers(self, path):
+        self.set_header("Cache-control", "no-cache")
+
+
 @command()
-def main(port=('p', 9999, 'port to listen on')):
+def main(port=('p', 9999, 'port to listen on'),
+         dev=('', False, 'run in development mode')):
     '''Start Gomoku server
     '''
     ApiRouter = SockJSRouter(ApiServer, '/api')
 
+    StaticFileHandler = (NoCacheStaticFileHandler if dev
+                         else web.StaticFileHandler)
+
     app = web.Application(ApiRouter.urls + [
             (r'/', IndexHandler),
-            (r'/(.*)', web.StaticFileHandler,
+            (r'/(.*)', StaticFileHandler,
              {'path': op.join(ROOT, 'static')})
-            ], debug=True)
+            ], debug=dev)
 
     app.listen(port)
     print 'listening %s...' % port

@@ -12,7 +12,57 @@ function parseField(src) {
     });
 }
 
-app.service('data', function() {
+function unparseField(rows) {
+    return rows.map(function(x) { return x.join(''); }).join('\n');
+}
+
+function transpose(arr) {
+    return Object.keys(arr[0]).map(function (c) {
+        return arr.map(function (r) {
+            return r[c];
+        });
+    });
+}
+
+function checkWin(field, chr, n) {
+    var re = new RegExp(chr + '{' + n + '}');
+
+    // horizontal win
+    if (re.test(unparseField(field)))
+        return true;
+
+    // vertical win
+    if (re.test(unparseField(transpose(field))))
+        return true;
+
+    function getSpaces(n) {
+        var spaces = [];
+        for (var i = 0; i < n; i++) {
+            spaces.push(' ');
+        }
+        return spaces;
+    }
+
+    // left-to-right diagonal win
+    var diag = [];
+    for (var i = field.length - 1; i >= 0; i--) {
+        diag.unshift(getSpaces(field.length - i - 1).concat(field[i]));
+    }
+    if (re.test(unparseField(transpose(diag))))
+        return true;
+
+    // right-to-left diagonal win
+    diag = [];
+    for (i = 0; i < field.length; i++) {
+        diag.unshift(getSpaces(i).concat(field[i]));
+    }
+    if (re.test(unparseField(transpose(diag))))
+        return true;
+
+    return false;
+}
+
+app.service('data', function($rootScope) {
     var name = localStorage.name;
     var state = this.state = {
         name: name,
@@ -23,6 +73,7 @@ app.service('data', function() {
         openGame: function(game) {
             state.current = game;
             state.mode = 'game';
+            $rootScope.$broadcast('game-update');
         }
     };
 });
@@ -74,7 +125,7 @@ app.controller('App', function($scope, data, sock) {
     };
 });
 
-app.controller('Start', function($scope, data, sock) {
+app.controller('Login', function($scope, data, sock) {
     $scope.state = data.state;
 
     $scope.login = function() {
@@ -127,15 +178,19 @@ app.controller('Info', function($scope, data) {
 });
 
 app.controller('Game', function($scope, data, sock) {
+    window.ggg = $scope;
     $scope.state = data.state;
+    function updateState() {
+        $scope.game = data.state.current;
+        $scope.field = parseField($scope.game.field);
+        $scope.symbol = $scope.game.player1 == state.name ? 'x' : 'o';
+        $scope.myTurn = $scope.game.player1 == state.name ^
+            $scope.game.eventurn;
+        $scope.lastTurn = null;
+    }
     // $scope.$watch('state', function(state) {
-    $scope.game = data.state.current;
-    $scope.field = parseField($scope.game.field);
-    $scope.symbol = $scope.game.player1 == state.name ? 'x' : 'o';
-    $scope.myTurn = $scope.game.player1 == state.name ^
-        $scope.game.eventurn;
-    $scope.lastTurn = null;
-    // });
+    $scope.$on('game-update', updateState);
+    updateState();
 
     $scope.nbspMaybe = function(c) {
         return c === ' ' ? '&nbsp;' : c;

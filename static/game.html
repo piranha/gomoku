@@ -7,7 +7,7 @@
         <tr ng-repeat="line in field track by $index">
           <td ng-repeat="c in line track by $index"
               ng-click="put($parent.$index, $index)"
-              ng-class="{x-used: c === 'x', o-used: c === 'o'}"
+              ng-class="{usedx: c === 'x', usedo: c === 'o'}"
               ng-bind-html-unsafe="nbspMaybe(c)">
           </td>
         </tr>
