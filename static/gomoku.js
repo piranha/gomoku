@@ -49,6 +49,7 @@ app.service('sock', function($rootScope) {
 
 app.controller('App', function($scope, data, sock) {
     var state = $scope.state = data.state;
+    window.state = state;
 
     sock.on('games', function(v) {
         state.games = v;
@@ -126,18 +127,23 @@ app.controller('Info', function($scope, data) {
 });
 
 app.controller('Game', function($scope, data, sock) {
+    $scope.state = data.state;
+    // $scope.$watch('state', function(state) {
     $scope.game = data.state.current;
     $scope.field = parseField($scope.game.field);
-    $scope.symbol = $scope.game.player1 == data.state.name ? 'x' : 'o';
-    $scope.myTurn = $scope.game.player1 == data.state.name ^
+    $scope.symbol = $scope.game.player1 == state.name ? 'x' : 'o';
+    $scope.myTurn = $scope.game.player1 == state.name ^
         $scope.game.eventurn;
     $scope.lastTurn = null;
+    // });
 
     $scope.nbspMaybe = function(c) {
         return c === ' ' ? '&nbsp;' : c;
     };
 
     $scope.put = function(x, y) {
+        if (!$scope.myTurn)
+            return;
         if ($scope.lastTurn) // do nothing until we get approval for last turn
             return;
         if ($scope.field[x][y] !== ' ')
@@ -158,5 +164,13 @@ app.controller('Game', function($scope, data, sock) {
 
     sock.on('turn:success', function() {
         $scope.lastTurn = null;
+    });
+
+    sock.on('game', function(g) {
+        // this is so wrong that I have no words, but AngularJS
+        // really doesn't want to update my state
+        // $scope.game = g;
+        // $scope.field = parseField(g.field);
+        // $scope.$digest();
     });
 });

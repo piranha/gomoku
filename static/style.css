@@ -12,6 +12,14 @@ table.table {
     background-color: #dff0d8;
 }
 
-.table td.used:hover {
+.table td.x-user {
+    background-color: gray;
+}
+
+.table td.o-user {
+    background-color: yellow;
+}
+
+.table td.x-used:hover, .table td.o-used:hover {
     background-color: #f2dede;
 }

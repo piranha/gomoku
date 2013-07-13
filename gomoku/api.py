@@ -122,9 +122,11 @@ class ApiServer(SockJSConnection):
         if not ((name == game['player1']) ^ game['eventurn']):
             return self.send(m('turn:error', 'Not your turn'))
 
-        if get_field_char(game['field'], x, y) != ' ':
+        if get_field_char(game, x, y) != ' ':
             return self.send(m('turn:error', 'Field is already used'))
 
         char = 'x' if name == game['player1'] else 'o'
-        game['field'] = set_field_char(game['field'], x, y, char)
+        set_field_char(game, x, y, char)
+        game['eventurn'] = not game['eventurn']
+        self.send(m('turn:success'))
         self.to_participants(game, m('game', game))
