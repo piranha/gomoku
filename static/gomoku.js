@@ -222,12 +222,4 @@ app.controller('Game', function($scope, data, sock) {
     sock.on('turn:success', function() {
         $scope.lastTurn = null;
     });
-
-    sock.on('game', function(g) {
-        // this is so wrong that I have no words, but AngularJS
-        // really doesn't want to update my state
-        // $scope.game = g;
-        // $scope.field = parseField(g.field);
-        // $scope.$digest();
-    });
 });

@@ -3,7 +3,8 @@ import uuid
 
 from sockjs.tornado import SockJSConnection
 
-from gomoku.utils import drop, empty_field, get_field_char, set_field_char
+from gomoku.utils import (drop, empty_field, get_field_char, set_field_char,
+                          check_win)
 
 
 def m(type, value=''):
@@ -30,8 +31,7 @@ class ApiServer(SockJSConnection):
         super(ApiServer, self).send(json.dumps(msg))
 
     def to_participants(self, game, msg):
-        players = [self.by_name(game['player1']), self.by_name(game['player2'])]
-        self.broadcast(players, msg)
+        self.broadcast(self.participants(game), msg)
 
     # game api
 
@@ -42,6 +42,9 @@ class ApiServer(SockJSConnection):
         for p, i in self.players.iteritems():
             if i['name'] == name:
                 return p
+
+    def participants(self, game):
+        return self.by_name(game['player1']), self.by_name(game['player2'])
 
     def game(self, id):
         for game in self.games:
@@ -130,4 +133,9 @@ class ApiServer(SockJSConnection):
         set_field_char(game, x, y, char)
         game['eventurn'] = not game['eventurn']
         self.send(m('turn:success'))
+
+        c = check_win(game)
+        if c:
+            game['done'] = c
+
         self.to_participants(game, m('game', game))

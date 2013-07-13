@@ -3,6 +3,9 @@
     <div class="span8">
       <h1>Fight: {{ game.player1 }} (x) vs {{ game.player2 }} (o)</h1>
 
+      <h2 ng-show="game.done === symbol">Finished him!</h2>
+      <h2 ng-show="game.done && game.done !== symbol">You lost!</h2>
+
       <table class="table table-bordered">
         <tr ng-repeat="line in field track by $index">
           <td ng-repeat="c in line track by $index"
