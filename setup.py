@@ -10,6 +10,7 @@ setup(name='gomoku',
       author_email='alexander@solovyov.net',
       url='http://github.com/piranha/gomoku/',
       install_requires=['tornado', 'opster'],
+      setup_requires=['nose'],
       packages=['gomoku'],
 
       entry_points={
