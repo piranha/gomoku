@@ -23,6 +23,7 @@ class NoCacheStaticFileHandler(web.StaticFileHandler):
 
 @command()
 def main(port=('p', 9999, 'port to listen on'),
+         address=('a', '127.0.0.1', 'address to listen on'),
          dev=('', False, 'run in development mode')):
     '''Start Gomoku server
     '''
@@ -37,8 +38,8 @@ def main(port=('p', 9999, 'port to listen on'),
              {'path': op.join(ROOT, 'static')})
             ], debug=dev)
 
-    app.listen(port)
-    print 'listening %s...' % port
+    app.listen(port, address)
+    print 'listening %s:%s...' % (address, port)
     try:
         ioloop.IOLoop.instance().start()
     except KeyboardInterrupt:
