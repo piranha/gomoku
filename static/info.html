@@ -6,7 +6,7 @@
   <dd>{{state.playerCount}}</dd>
 
   <dt>Your Games</dt>
-  <dd ng-repeat="game in state.games">
-    {{game}}
+  <dd ng-repeat="game in myGames">
+    <a href="#" ng-click="open(game.id)">{{game.id}}</a>
   </dd>
 </dl>

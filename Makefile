@@ -1,2 +1,2 @@
 run:
-	python -m server.main
+	python -m gomoku.main

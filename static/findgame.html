@@ -7,7 +7,11 @@
 
       <ul>
         <li ng-repeat="game in state.games">
-          {{game}}
+          Game {{game.id}}
+          <span ng-show="!game.player2">waiting for players</span>
+          <span ng-show="game.player1 !== state.name && !game.player2">
+            <a href="#" ng-click="join(game.id)">Fight!</a>
+          </span>
         </li>
       </ul>
     </div>

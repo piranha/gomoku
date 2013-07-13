@@ -5,13 +5,25 @@ function send(type, value) {
     sockjs.send(JSON.stringify({type: type, value: value}));
 }
 
+function parseField(src) {
+    return src.split('\n').map(function(line) {
+        return Array.prototype.map.call(line,
+                                        function(x) { return x; });
+    });
+}
+
 app.service('data', function() {
     var name = localStorage.name;
-    this.state = {
+    var state = this.state = {
         name: name,
-        mode: 'start',
+        mode: 'login',
         games: [],
-        playerCount: 0
+        current: null,
+        playerCount: 0,
+        openGame: function(game) {
+            state.current = game;
+            state.mode = 'game';
+        }
     };
 });
 
@@ -46,6 +58,16 @@ app.controller('App', function($scope, data, sock) {
         state.playerCount = v;
     });
 
+    sock.on('game', function(g) {
+        if (state.mode == 'findgame' || state.mode == 'game') {
+            state.openGame(g);
+        }
+    });
+
+    sock.on('open', function(g) {
+        data.state.openGame(g);
+    });
+
     $scope.pageName = function() {
         return state.mode + '.html';
     };
@@ -54,7 +76,6 @@ app.controller('App', function($scope, data, sock) {
 app.controller('Start', function($scope, data, sock) {
     $scope.state = data.state;
 
-    window.start = $scope;
     $scope.login = function() {
         if (!$scope.state.name) {
             return;
@@ -74,6 +95,10 @@ app.controller('Start', function($scope, data, sock) {
     $scope.$watch('state.name', function(v) {
         $scope.error = null;
     });
+
+    if ($scope.state.name) {
+        $scope.login();
+    }
 });
 
 app.controller('FindGame', function($scope, data) {
@@ -82,10 +107,56 @@ app.controller('FindGame', function($scope, data) {
     $scope.newGame = function() {
         send('new');
     };
+
+    $scope.join = function(id) {
+        send('join', id);
+    };
 });
 
 app.controller('Info', function($scope, data) {
     $scope.state = data.state;
 
-    window.info = $scope;
+    $scope.myGames = $scope.state.games.filter(function(g) {
+        return g.player1 == data.state.name || g.player2 == data.state.name;
+    });
+
+    $scope.open = function(id) {
+        send('open', id);
+    };
+});
+
+app.controller('Game', function($scope, data, sock) {
+    $scope.game = data.state.current;
+    $scope.field = parseField($scope.game.field);
+    $scope.symbol = $scope.game.player1 == data.state.name ? 'x' : 'o';
+    $scope.myTurn = $scope.game.player1 == data.state.name ^
+        $scope.game.eventurn;
+    $scope.lastTurn = null;
+
+    $scope.nbspMaybe = function(c) {
+        return c === ' ' ? '&nbsp;' : c;
+    };
+
+    $scope.put = function(x, y) {
+        if ($scope.lastTurn) // do nothing until we get approval for last turn
+            return;
+        if ($scope.field[x][y] !== ' ')
+            return;
+        $scope.field[x][y] = $scope.symbol;
+        $scope.lastTurn = [x, y];
+        $scope.game.eventurn = !$scope.game.eventurn;
+        send('turn', [$scope.game.id, [x, y]]);
+    };
+
+    sock.on('turn:error', function() {
+        if (!$scope.lastTurn)
+            return;
+        $scope.field[$scope.lastTurn[0]][$scope.lastTurn[1]] = ' ';
+        $scope.lastTurn = null;
+        $scope.game.eventurn = !$scope.game.eventurn;
+    });
+
+    sock.on('turn:success', function() {
+        $scope.lastTurn = null;
+    });
 });
