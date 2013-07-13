@@ -9,7 +9,7 @@ setup(name='gomoku',
       author='Alexander Solovyov',
       author_email='alexander@solovyov.net',
       url='http://github.com/piranha/gomoku/',
-      install_requires=['tornado', 'opster'],
+      install_requires=['tornado', 'sockjs-tornado', 'opster'],
       setup_requires=['nose'],
       packages=['gomoku'],
 
