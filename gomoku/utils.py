@@ -20,11 +20,17 @@ def set_field_char(game, x, y, char):
     return game
 
 
-def pre_space(l, i):
+def pad(l, i):
     return ' ' * i + l
 
+def lenghten(s, l):
+    return s + ' ' * (l - len(s))
+
 def transpose(f):
-    return '\n'.join(map(lambda x: ''.join(x), zip(*f.split('\n'))))
+    lines = f.split('\n')
+    maxlen = max(map(len, lines))
+    lines = map(lambda x: lenghten(x, maxlen), lines)
+    return '\n'.join(map(lambda x: ''.join(x), zip(*lines)))
 
 def check_win(game):
     RE = re.compile('(x{%(inarow)s}|o{%(inarow)s})' % game)
@@ -42,7 +48,7 @@ def check_win(game):
         return m.groups()[0][0]
 
     # rtl
-    newfield = '\n'.join([pre_space(line, i) for i, line in
+    newfield = '\n'.join([pad(line, i) for i, line in
                           enumerate(field.split('\n'))])
     m = RE.search(transpose(newfield))
     if m:
@@ -50,7 +56,7 @@ def check_win(game):
 
     # ltr
     l = len(field)
-    newfield = '\n'.join([pre_space(line, l - i - 1) for i, line in
+    newfield = '\n'.join([pad(line, l - i - 1) for i, line in
                           enumerate(field.split('\n'))])
     m = RE.search(transpose(newfield))
     if m:
