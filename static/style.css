@@ -15,3 +15,7 @@ table.table {
 .table td.usedo {
     background-color: yellow;
 }
+
+.active {
+    color: red;
+}
