@@ -61,7 +61,7 @@ class ApiServer(SockJSConnection):
 
     def bc_games(self):
         self.broadcast([p for p, i in self.players.items() if i['name']],
-                       m('games', self.open_games()))
+                       m('games', self.games))
 
     # sockjs handlers
 
