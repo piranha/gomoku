@@ -14,18 +14,24 @@ function parseField(src) {
 
 app.service('data', function($rootScope) {
     var name = localStorage.name;
+
     var state = this.state = {
         name: name,
         mode: 'login',
         games: [],
         current: null,
-        playerCount: 0,
-        openGame: function(game) {
-            state.current = game;
-            state.mode = 'game';
-            $rootScope.$broadcast('game-update');
-        }
+        playerCount: 0
     };
+
+    function openGame(game) {
+        state.current = game;
+        state.mode = 'game';
+        $rootScope.$broadcast('game-update');
+    }
+
+    $rootScope.$on('open-game', function(e, game) {
+        openGame(game);
+    });
 });
 
 app.service('sock', function($rootScope) {
@@ -54,20 +60,18 @@ app.controller('App', function($scope, data, sock) {
 
     sock.on('games', function(v) {
         state.games = v;
+        if (state.current) {
+            for (var i = 0; i < v.length; i++) {
+                if (v[i].id == state.current.id) {
+                    $scope.$emit('open-game', v[i]);
+                    break;
+                }
+            }
+        }
     });
 
     sock.on('players', function(v) {
         state.playerCount = v;
-    });
-
-    sock.on('game', function(g) {
-        if (state.mode == 'findgame' || state.mode == 'game') {
-            state.openGame(g);
-        }
-    });
-
-    sock.on('open', function(g) {
-        data.state.openGame(g);
     });
 
     $scope.pageName = function() {
@@ -106,8 +110,24 @@ app.controller('Login', function($scope, data, sock) {
 app.controller('FindGame', function($scope, data) {
     $scope.state = data.state;
 
-    $scope.join = function(id) {
-        send('join', id);
+    $scope.isFull = function(game) {
+        return game.player1 && game.player2;
+    };
+
+    $scope.isMine = function(game) {
+        return (game.player1 == $scope.state.name ||
+                game.player2 == $scope.state.name);
+    };
+
+    $scope.canFight = function(game) {
+        return !$scope.isMine(game) && !$scope.isFull(game);
+    };
+
+    $scope.join = function(game) {
+        if ($scope.canFight(game)) {
+            send('join', game.id);
+        }
+        $scope.$emit('open-game', game);
     };
 });
 
@@ -131,8 +151,8 @@ app.controller('Info', function($scope, data) {
         return g.player1 == data.state.name || g.player2 == data.state.name;
     });
 
-    $scope.open = function(id) {
-        send('open', id);
+    $scope.open = function(game) {
+        $scope.$emit('open-game', game);
     };
 
     $scope.toGameFinder = function() {
@@ -147,6 +167,7 @@ app.controller('Info', function($scope, data) {
 });
 
 app.controller('Game', function($scope, data, sock) {
+    window.ggg = $scope;
     $scope.state = data.state;
     function updateState() {
         $scope.game = data.state.current;

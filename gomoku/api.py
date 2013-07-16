@@ -3,8 +3,7 @@ import uuid
 
 from sockjs.tornado import SockJSConnection
 
-from gomoku.utils import (drop, empty_field, get_field_char, set_field_char,
-                          check_win)
+from gomoku.utils import empty_field, get_field_char, set_field_char, check_win
 
 
 def m(type, value=''):
@@ -52,8 +51,7 @@ class ApiServer(SockJSConnection):
                 return game
 
     def open_games(self):
-        return map(lambda g: drop(g, 'field'),
-                   filter(lambda x: not x['done'], self.games))
+        return filter(lambda x: not x['done'], self.games)
 
     def bc_players(self):
         self.broadcast(self.players, m('players', len(self.players)))
@@ -96,15 +94,17 @@ class ApiServer(SockJSConnection):
         else:
             self.info['name'] = value
             self.send(m('name:success'))
-            self.send_games()
+            self.send(m('games', self.open_games()))
 
     def handle_new(self, value):
+        size = int(value.get('size', 15))
+        inarow = int(value.get('inarow', 5))
         game = {'id': uuid.uuid4().hex[:6],
                 'player1': None,
                 'player2': None,
-                'size': value.get('size', 15),
-                'inarow': value.get('inarow', 5),
-                'field': empty_field(15),
+                'size': size,
+                'inarow': inarow,
+                'field': empty_field(size),
                 'eventurn': False,
                 'done': None}
         name = self.players[self]['name']
@@ -118,11 +118,8 @@ class ApiServer(SockJSConnection):
             game['player1'] = self.name()
         elif not game['player2']:
             game['player2'] = self.name()
-        self.send_games()
-        self.to_participants(game, m('game', game))
-
-    def handle_open(self, id):
-        self.send(m('open', self.game(id)))
+        self.bc_games()
+        # self.to_participants(game, m('game', game['id']))
 
     def handle_turn(self, (id, (x, y))):
         game = self.game(id)
@@ -146,4 +143,5 @@ class ApiServer(SockJSConnection):
         if c:
             game['done'] = c
 
-        self.to_participants(game, m('game', game))
+        self.bc_games()
+        # self.to_participants(game, m('game', game))

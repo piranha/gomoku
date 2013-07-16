@@ -1,9 +1,10 @@
 <div class="span12" ng-controller="Game">
   <div class="row">
     <div class="span8">
-      <h1>Fight:
-        <span ng-class="{active: !game.eventurn}">{{ game.player1 }} (x)</span> vs
-        <span ng-class="{active: game.eventurn}">{{ game.player2 }} (o)</span></h1>
+      <h1>Fight {{game.id}}:
+        <span ng-class="{active: !game.eventurn}">{{ game.player1 || '[empty]' }} (x)</span> vs
+        <span ng-class="{active: game.eventurn}">{{ game.player2 || '[empty]' }} (o)</span>
+      </h1>
 
       <h2 ng-show="game.done === symbol">Finished him!</h2>
       <h2 ng-show="game.done && game.done !== symbol">You lost!</h2>

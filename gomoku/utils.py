@@ -1,13 +1,6 @@
 import re
 
 
-def drop(d, *keys):
-    n = dict(d)
-    for k in keys:
-        del n[k]
-    return n
-
-
 def empty_field(n):
     return '\n'.join([' ' * n] * n)
 

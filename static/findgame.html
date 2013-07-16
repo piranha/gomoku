@@ -7,11 +7,11 @@
 
       <ul>
         <li ng-repeat="game in state.games">
-          Game {{game.id}}
-          <span ng-show="!game.player2">waiting for players</span>
-          <span ng-show="game.player1 !== state.name && !game.player2">
-            <a href="#" ng-click="join(game.id)">Fight!</a>
-          </span>
+          <a href="#" ng-click="join(game)">
+            {{isMine(game) && 'Open' || canFight(game) && 'Fight' || 'Watch'}}
+          </a>
+          -
+          Game {{game.id}}: {{game.player1 || '[empty]'}} vs {{game.player2 || '[empty]'}}
         </li>
       </ul>
     </div>
