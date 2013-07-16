@@ -95,19 +95,24 @@ class ApiServer(SockJSConnection):
             self.send_games()
 
     def handle_new(self, value):
-        self.games.insert(0, {'id': uuid.uuid4().hex[:6],
-                              'player1': self.players[self]['name'],
-                              'player2': None,
-                              'size': 15,
-                              'inarow': 5,
-                              'field': empty_field(15),
-                              'eventurn': False,
-                              'done': None})
+        game = {'id': uuid.uuid4().hex[:6],
+                'player1': None,
+                'player2': None,
+                'size': value.get('size', 15),
+                'inarow': value.get('inarow', 5),
+                'field': empty_field(15),
+                'eventurn': False,
+                'done': None}
+        name = self.players[self]['name']
+        game['player2' if value.get('second') else 'player1'] = name
+        self.games.insert(0, game)
         self.bc_games()
 
     def handle_join(self, id):
         game = self.game(id)
-        if game['player2'] == None:
+        if not game['player1']:
+            game['player1'] = self.name()
+        elif not game['player2']:
             game['player2'] = self.name()
         self.send_games()
         self.to_participants(game, m('game', game))

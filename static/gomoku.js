@@ -12,56 +12,6 @@ function parseField(src) {
     });
 }
 
-function unparseField(rows) {
-    return rows.map(function(x) { return x.join(''); }).join('\n');
-}
-
-function transpose(arr) {
-    return Object.keys(arr[0]).map(function (c) {
-        return arr.map(function (r) {
-            return r[c];
-        });
-    });
-}
-
-function checkWin(field, chr, n) {
-    var re = new RegExp(chr + '{' + n + '}');
-
-    // horizontal win
-    if (re.test(unparseField(field)))
-        return true;
-
-    // vertical win
-    if (re.test(unparseField(transpose(field))))
-        return true;
-
-    function preSpace(l, n) {
-        var spaces = [];
-        for (var i = 0; i < n; i++) {
-            spaces.push(' ');
-        }
-        return spaces.concat(l);
-    }
-
-    // left-to-right diagonal win
-    var diag = [];
-    for (var i = field.length - 1; i >= 0; i--) {
-        diag.unshift(preSpace(field[i], field.length - i - 1));
-    }
-    if (re.test(unparseField(transpose(diag))))
-        return true;
-
-    // right-to-left diagonal win
-    diag = [];
-    for (i = 0; i < field.length; i++) {
-        diag.push(preSpace(field[i], i));
-    }
-    if (re.test(unparseField(transpose(diag))))
-        return true;
-
-    return false;
-}
-
 app.service('data', function($rootScope) {
     var name = localStorage.name;
     var state = this.state = {
@@ -156,13 +106,22 @@ app.controller('Login', function($scope, data, sock) {
 app.controller('FindGame', function($scope, data) {
     $scope.state = data.state;
 
-    $scope.newGame = function() {
-        send('new');
-    };
-
     $scope.join = function(id) {
         send('join', id);
     };
+});
+
+app.controller('NewGame', function($scope) {
+    $scope.size = 15;
+    $scope.inarow = 5;
+    $scope.second = false;
+
+    $scope.newGame = function() {
+        send('new', {size: $scope.size,
+                     inarow: $scope.inarow,
+                     second: $scope.second});
+    };
+
 });
 
 app.controller('Info', function($scope, data) {
@@ -192,7 +151,6 @@ app.controller('Game', function($scope, data, sock) {
             $scope.game.eventurn;
         $scope.lastTurn = null;
     }
-    // $scope.$watch('state', function(state) {
     $scope.$on('game-update', updateState);
     updateState();
 
@@ -205,7 +163,7 @@ app.controller('Game', function($scope, data, sock) {
             return;
         if (!$scope.myTurn)
             return;
-        if ($scope.lastTurn) // do nothing until we get approval for last turn
+        if ($scope.lastTurn) // do nothing until last turn is approved
             return;
         if ($scope.field[x][y] !== ' ')
             return;

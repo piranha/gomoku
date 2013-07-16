@@ -3,7 +3,21 @@
     <div class="span8">
       <h1>Choose your destiny</h1>
 
-      <h2><a href="#" ng-click="newGame()">Create new game</a></h2>
+      <form class="form-inline" ng-controller="NewGame">
+        <label>
+          Size
+          <input class="input-small" ng-model="size">
+        </label>
+        <label>
+          In a row
+          <input class="input-small" ng-model="inarow">
+        </label>
+        <label>
+          <input type="checkbox" ng-model="second">
+          I want to play zeros
+        </label>
+        <button type="submit" class="btn primary" ng-click="newGame()">Create new game</button>
+      </form>
 
       <ul>
         <li ng-repeat="game in state.games">
