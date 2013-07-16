@@ -147,7 +147,6 @@ app.controller('Info', function($scope, data) {
 });
 
 app.controller('Game', function($scope, data, sock) {
-    window.ggg = $scope;
     $scope.state = data.state;
     function updateState() {
         $scope.game = data.state.current;
