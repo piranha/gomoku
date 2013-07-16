@@ -3,6 +3,8 @@ table.table {
 }
 
 .table td {
+    width: 30px;
+    max-width: 30px;
     cursor: pointer;
     text-align: center;
     vertical-align: middle;

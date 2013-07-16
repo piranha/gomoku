@@ -199,6 +199,10 @@ app.controller('Game', function($scope, data, sock) {
         send('turn', [$scope.game.id, [x, y]]);
     };
 
+    $scope.tableWidth = function() {
+        return {'width': $scope.game.size * 30 + 'px'};
+    };
+
     sock.on('turn:error', function() {
         if (!$scope.lastTurn)
             return;

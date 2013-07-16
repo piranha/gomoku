@@ -9,7 +9,9 @@
       <h2 ng-show="game.done === symbol">Finished him!</h2>
       <h2 ng-show="game.done && game.done !== symbol">You lost!</h2>
 
-      <table class="table table-bordered" ng-class="{muted: game.done}">
+      <table class="table table-bordered"
+             ng-class="{muted: game.done}"
+             ng-style="tableWidth()">
         <tr ng-repeat="line in field track by $index">
           <td ng-repeat="c in line track by $index"
               ng-click="put($parent.$index, $index)"
