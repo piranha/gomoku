@@ -1,0 +1,15 @@
+<form class="form-inline" ng-controller="NewGame">
+  <label>
+    Size
+    <input class="input-mini" ng-model="size">
+  </label>
+  <label>
+    In a row
+    <input class="input-mini" ng-model="inarow">
+  </label>
+  <label>
+    <input type="checkbox" ng-model="second">
+    I want to play zeros
+  </label>
+  <button type="submit" class="btn primary" ng-click="newGame()">Create new game</button>
+</form>

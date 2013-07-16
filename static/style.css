@@ -19,3 +19,7 @@ table.table {
 .active {
     color: red;
 }
+
+.well > form.form-inline {
+    margin-bottom: 0;
+}
