@@ -1,20 +1,20 @@
-<div class="span12" ng-controller="Login">
-  <h1>Welcome to Gomoku!</h1>
+<div class="row" ng-controller="Login">
+  <div class="span8">
+    <h1>Welcome to Gomoku!</h1>
 
-  <form class="form-horizontal">
-    <div class="control-group">
-      <label class="control-label" for="input-name">Name</label>
-      <div class="controls">
-        <input type="text" id="input-name" placeholder="Name" ng-model="state.name">
-        <p class="text-error">{{error}}</p>
+    <form class="form-horizontal">
+      <div class="control-group">
+        <label class="control-label" for="input-name">Name</label>
+        <div class="controls">
+          <input type="text" id="input-name" placeholder="Name" ng-model="state.name">
+          <p class="text-error">{{error}}</p>
+        </div>
       </div>
-    </div>
-
-    <div class="control-group">
-      <div class="controls">
-        <button class="btn primary" ng-click="login()">Enter</button>
+      <div class="control-group">
+        <div class="controls">
+          <button class="btn primary" ng-click="login()">Enter</button>
+        </div>
       </div>
-    </div>
-  </form>
-  
+    </form>
+  </div>
 </div>

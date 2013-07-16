@@ -2,17 +2,16 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gomoku</title>
   <link href="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" rel="stylesheet">
   <link href="style.css" rel="stylesheet">
   <script src="http://cdn.sockjs.org/sockjs-0.3.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular-mobile.min.js"></script>
-
   <script src="gomoku.js"></script>
 </head>
-<body class="container" ng-controller="App">
-  <div class="row" ng-include="pageName()"></div>
+<body class="container" ng-controller="App" ng-include="pageName()">
   <script>
     angular.element(document).ready(function() {
         window.sockjs = new SockJS('/api');

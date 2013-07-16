@@ -1,22 +1,19 @@
-<div class="span12" ng-controller="FindGame">
-  <div class="row">
-    <div class="span8">
-      <h1>Choose your destiny</h1>
+<div class="row" ng-controller="FindGame">
+  <div class="span8">
+    <h1>Choose your destiny</h1>
 
-      <div class="well well-small" ng-include="'newgame.html'"></div>
+    <div class="well well-small" ng-include="'newgame.html'"></div>
 
-      <ul>
-        <li ng-repeat="game in state.games">
-          <a href="#" ng-click="join(game)">
-            {{isMine(game) && 'Open' || canFight(game) && 'Fight' || 'Watch'}}
-          </a>
-          -
-          Game {{game.id}}: {{game.player1 || '[empty]'}} vs {{game.player2 || '[empty]'}}
-        </li>
-      </ul>
-    </div>
-
-    <div class="span4" ng-include="'info.html'"></div>
+    <ul>
+      <li ng-repeat="game in state.games">
+        <a href="#" ng-click="join(game)">
+          {{isMine(game) && 'Open' || canFight(game) && 'Fight' || 'Watch'}}
+        </a>
+        -
+        Game {{game.id}}: {{game.player1 || '[empty]'}} vs {{game.player2 || '[empty]'}}
+      </li>
+    </ul>
   </div>
-</div>
 
+  <div class="span4" ng-include="'info.html'"></div>
+</div>
