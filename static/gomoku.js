@@ -138,6 +138,12 @@ app.controller('Info', function($scope, data) {
     $scope.toGameFinder = function() {
         data.state.mode = 'findgame';
     };
+
+    $scope.logout = function() {
+        data.state.name = '';
+        data.state.mode = 'login';
+        send('name', null);
+    };
 });
 
 app.controller('Game', function($scope, data, sock) {

@@ -65,7 +65,7 @@ class ApiServer(SockJSConnection):
         self.broadcast([p for p, i in self.players.items() if i['name']],
                        m('games', self.open_games()))
 
-    # message handlers
+    # sockjs handlers
 
     def on_open(self, info):
         self.players[self] = self.info
@@ -86,8 +86,12 @@ class ApiServer(SockJSConnection):
         else:
             print 'No handler for %s' % type
 
+    # message handlers
+
     def handle_name(self, value):
-        if any((i['name'] == value) for p, i in self.players.iteritems()):
+        if value == None:
+            self.info['name'] = None
+        elif any((i['name'] == value) for p, i in self.players.iteritems()):
             self.send(m('name:error', 'Name is taken'))
         else:
             self.info['name'] = value
