@@ -21,14 +21,9 @@ app.service('data', function($rootScope) {
         playerCount: 0
     };
 
-    function openGame(game) {
+    $rootScope.$on('open-game', function(e, game) {
         state.current = game;
         state.mode = 'game';
-        $rootScope.$broadcast('game-update');
-    }
-
-    $rootScope.$on('open-game', function(e, game) {
-        openGame(game);
     });
 });
 
@@ -80,6 +75,7 @@ app.controller('App', function($scope, data, sock) {
                 }
             }
         }
+        $scope.$root.$broadcast('game-update');
     });
 
     sock.on('players', function(v) {
@@ -160,9 +156,13 @@ app.controller('NewGame', function($scope, persister) {
 app.controller('Info', function($scope, data) {
     $scope.state = data.state;
 
-    $scope.myGames = $scope.state.games.filter(function(g) {
-        return g.player1 == data.state.name || g.player2 == data.state.name;
-    });
+    function updateState() {
+        $scope.myGames = $scope.state.games.filter(function(g) {
+            return g.player1 == data.state.name || g.player2 == data.state.name;
+        });
+    }
+    $scope.$on('game-update', updateState);
+    updateState();
 
     $scope.open = function(game) {
         $scope.$emit('open-game', game);

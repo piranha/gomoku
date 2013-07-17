@@ -70,7 +70,7 @@ class ApiServer(SockJSConnection):
         self.broadcast(self.players, m('players', len(self.players)))
 
     def send_games(self):
-        self.send(m('games', self.open_games()))
+        self.send(m('games', self.games))
 
     def bc_games(self):
         self.broadcast([p for p, i in self.players.items() if i['name']],
