@@ -13,10 +13,8 @@ function parseField(src) {
 }
 
 app.service('data', function($rootScope) {
-    var name = localStorage.name;
-
     var state = this.state = {
-        name: name,
+        name: localStorage.name,
         mode: 'login',
         games: [],
         current: null,
@@ -32,6 +30,16 @@ app.service('data', function($rootScope) {
     $rootScope.$on('open-game', function(e, game) {
         openGame(game);
     });
+});
+
+app.service('persister', function() {
+    this.add = function($scope, name, def) {
+        var val = localStorage[name] && JSON.parse(localStorage[name]) || def;
+        $scope[name] = val;
+        $scope.$watch(name, function(value) {
+            localStorage[name] = JSON.stringify(value);
+        });
+    };
 });
 
 app.service('sock', function($rootScope) {
@@ -58,6 +66,10 @@ app.controller('App', function($scope, data, sock) {
     var state = $scope.state = data.state;
     window.state = state;
 
+    $scope.pageName = function() {
+        return state.mode + '.html';
+    };
+
     sock.on('games', function(v) {
         state.games = v;
         if (state.current) {
@@ -74,9 +86,10 @@ app.controller('App', function($scope, data, sock) {
         state.playerCount = v;
     });
 
-    $scope.pageName = function() {
-        return state.mode + '.html';
-    };
+    sock.on('info', function(info) {
+        state.info = info;
+        state.name = info.name;
+    });
 });
 
 app.controller('Login', function($scope, data, sock) {
@@ -131,10 +144,10 @@ app.controller('FindGame', function($scope, data) {
     };
 });
 
-app.controller('NewGame', function($scope) {
-    $scope.size = 15;
-    $scope.inarow = 5;
-    $scope.second = false;
+app.controller('NewGame', function($scope, persister) {
+    persister.add($scope, 'size', 15);
+    persister.add($scope, 'inarow', 5);
+    persister.add($scope, 'second', false);
 
     $scope.newGame = function() {
         send('new', {size: $scope.size,

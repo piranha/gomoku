@@ -35,3 +35,4 @@ def test_check_win():
     o          
                
                ''', size=15, inarow=5), 'x')
+    eq_(check('xxo\noox\nxxo'), ' ')

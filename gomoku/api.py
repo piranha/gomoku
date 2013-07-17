@@ -19,7 +19,7 @@ class ApiServer(SockJSConnection):
 
     def __init__(self, *args, **kwargs):
         super(ApiServer, self).__init__(*args, **kwargs)
-        self.info = {'name': '', 'mode': ''}
+        self.info = {'name': '', 'mode': '', 'total': 0, 'won': 0, 'lost': 0}
 
     # general api
 
@@ -32,9 +32,9 @@ class ApiServer(SockJSConnection):
     def to_participants(self, game, msg):
         self.broadcast(self.participants(game), msg)
 
-    # game api
+    # helpers
 
-    def name(self):
+    def my_name(self):
         return self.players[self]['name']
 
     def by_name(self, name):
@@ -50,8 +50,21 @@ class ApiServer(SockJSConnection):
             if game['id'] == id:
                 return game
 
-    def open_games(self):
-        return filter(lambda x: not x['done'], self.games)
+    def check_win(self, game):
+        c = check_win(game)
+        if not c:
+            return
+        game['done'] = c
+        p1, p2 = self.participants(game)
+        p1['total'] += 1
+        p2['total'] += 1
+        if c == ' ':
+            return
+        winner, loser = (p1, p2) if c == 'x' else (p2, p1)
+        winner['won'] += 1
+        loser['lost'] += 1
+
+    # notification methods
 
     def bc_players(self):
         self.broadcast(self.players, m('players', len(self.players)))
@@ -62,6 +75,9 @@ class ApiServer(SockJSConnection):
     def bc_games(self):
         self.broadcast([p for p, i in self.players.items() if i['name']],
                        m('games', self.games))
+
+    def send_info(self):
+        self.send(m('info', self.info))
 
     # sockjs handlers
 
@@ -94,7 +110,8 @@ class ApiServer(SockJSConnection):
         else:
             self.info['name'] = value
             self.send(m('name:success'))
-            self.send(m('games', self.open_games()))
+            self.send(m('games', self.games))
+        self.send_info()
 
     def handle_new(self, value):
         size = int(value.get('size', 15))
@@ -115,15 +132,15 @@ class ApiServer(SockJSConnection):
     def handle_join(self, id):
         game = self.game(id)
         if not game['player1']:
-            game['player1'] = self.name()
+            game['player1'] = self.my_name()
         elif not game['player2']:
-            game['player2'] = self.name()
+            game['player2'] = self.my_name()
         self.bc_games()
         # self.to_participants(game, m('game', game['id']))
 
     def handle_turn(self, (id, (x, y))):
         game = self.game(id)
-        name = self.name()
+        name = self.my_name()
 
         if None in (game['player2'], game['player1']):
             return self.send(m('turn:error', 'Not enough players'))
@@ -139,9 +156,11 @@ class ApiServer(SockJSConnection):
         game['eventurn'] = not game['eventurn']
         self.send(m('turn:success'))
 
-        c = check_win(game)
-        if c:
-            game['done'] = c
-
+        self.check_win(game)
         self.bc_games()
-        # self.to_participants(game, m('game', game))
+
+        self.games.remove(game)
+        self.bc_games()
+        for p in self.participants(game):
+            if p:
+                p.send_info()

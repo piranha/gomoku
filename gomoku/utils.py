@@ -33,6 +33,10 @@ def transpose(f):
     return '\n'.join(map(lambda x: ''.join(x), zip(*lines)))
 
 def check_win(game):
+    # draw
+    if ' ' not in game['field']:
+        return ' '
+
     RE = re.compile('(x{%(inarow)s}|o{%(inarow)s})' % game)
 
     field = game['field']
