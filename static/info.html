@@ -15,5 +15,9 @@
   <dt>Active Games</dt>
   <dd ng-repeat="game in myGames">
     <a href="#" ng-click="open(game)">{{game.id}}</a>
+    <span ng-show="{{!!(game.player1 && game.player2)}}">
+      - turn of {{game.eventurn && game.player2 || game.player1}}
+    </span>
+    <span ng-show="{{!(game.player1 && game.player2)}}">- no opponent</span>
   </dd>
 </dl>
