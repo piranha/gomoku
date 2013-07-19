@@ -159,6 +159,9 @@ class ApiServer(SockJSConnection):
         self.check_win(game)
         self.bc_games()
 
+        if not self.check_win(game):
+            return
+
         self.games.remove(game)
         self.bc_games()
         for p in self.participants(game):
