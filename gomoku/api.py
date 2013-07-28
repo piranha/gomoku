@@ -56,6 +56,7 @@ class ApiServer(SockJSConnection):
             return
         game['done'] = c
         p1, p2 = self.participants(game)
+        p1, p2 = self.players[p1], self.players[p2]
         p1['total'] += 1
         p2['total'] += 1
         if c == ' ':
